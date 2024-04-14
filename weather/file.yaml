@@ -1,0 +1,109 @@
+NAME: weather
+LAST DEPLOYED: Sat Apr 13 22:33:04 2024
+NAMESPACE: weather-app
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: weather/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: weather
+  labels:
+    helm.sh/chart: weather-0.1.0
+    app.kubernetes.io/name: weather
+    app.kubernetes.io/instance: weather
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: weather/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thomosis-weather
+  labels:
+    helm.sh/chart: weather-0.1.0
+    app.kubernetes.io/name: weather
+    app.kubernetes.io/instance: weather
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app: thomosis-weather
+---
+# Source: weather/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather
+  labels:
+    helm.sh/chart: weather-0.1.0
+    app.kubernetes.io/name: weather
+    app.kubernetes.io/instance: weather
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    app: thomosis-weather
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: weather
+      app.kubernetes.io/instance: weather
+      app: thomosis-weather
+  template:
+    metadata:
+      labels:
+        app: thomosis-weather
+        helm.sh/chart: weather-0.1.0
+        app.kubernetes.io/name: weather
+        app.kubernetes.io/instance: weather
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: weather
+      securityContext:
+        {}
+      containers:
+        - name: thomosis-weather
+          securityContext:
+            {}
+          image: "devopseasylearning/thomisis-weather:v0.0.1"
+          imagePullPolicy: Always
+          envFrom:
+           - configMapRef:
+              name: thomosis-weather-configMap
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /var/lib/weatherdata
+              name: weather-data
+              readOnly: true
+
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace weather-app -l "app.kubernetes.io/name=weather,app.kubernetes.io/instance=weather" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace weather-app $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace weather-app port-forward $POD_NAME 8080:$CONTAINER_PORT

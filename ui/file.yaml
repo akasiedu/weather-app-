@@ -1,0 +1,105 @@
+NAME: ui
+LAST DEPLOYED: Sat Apr 13 20:54:25 2024
+NAMESPACE: weather-app
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: ui/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ui
+  labels:
+    helm.sh/chart: ui-0.1.0
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/instance: ui
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: ui/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thomisis
+  labels:
+    helm.sh/chart: ui-0.1.0
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/instance: ui
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    app: thomosis_ui
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: thomosis_ui
+---
+# Source: ui/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  labels:
+    helm.sh/chart: ui-0.1.0
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/instance: ui
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+    app_name: thomosis_ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ui
+      app.kubernetes.io/instance: ui
+      app_name: thomosis_ui
+  template:
+    metadata:
+      labels:
+        app_name: thomosis_ui
+        helm.sh/chart: ui-0.1.0
+        app.kubernetes.io/name: ui
+        app.kubernetes.io/instance: ui
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: ui
+      securityContext:
+        {}
+      containers:
+        - name: thomosis_ui
+          securityContext:
+            {}
+          image: "devopseasylearning/thomisis-ui:v0.0.1"
+          imagePullPolicy: Always
+          envFrom:
+          - configMapRef:
+              name: thomosis_ui-configmap
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          resources:
+            {}
+
+NOTES:
+1. Get the application URL by running these commands:
+  export NODE_PORT=$(kubectl get --namespace weather-app -o jsonpath="{.spec.ports[0].nodePort}" services ui)
+  export NODE_IP=$(kubectl get nodes --namespace weather-app -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT

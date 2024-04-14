@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ui.fullname" . }}
+  name: {{ include "auth.fullname" . }}
   labels:
-    {{- include "ui.labels" . | nindent 4 }}
-    app_name: {{ .Values.app_name }}
+    {{- include "auth.labels" . | nindent 4 }}
+    app: {{ .Values.app_name }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ui.selectorLabels" . | nindent 6 }}
-      app_name: {{ .Values.app_name }}
+      {{- include "auth.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.app_name }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,8 +20,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app_name: {{ .Values.app_name }}
-        {{- include "ui.labels" . | nindent 8 }}
+        app: {{ .Values.app_name }}
+        {{- include "auth.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -30,7 +30,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ui.serviceAccountName" . }}
+      serviceAccountName: {{ include "auth.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

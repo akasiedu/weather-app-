@@ -1,14 +1,13 @@
-# Default values for ui.
+# Default values for weather.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-app_name: thomosis_ui
-
+app_name: thomosis-weather
 
 replicaCount: 1
 
 image:
-  repository: devopseasylearning/thomisis-ui
+  repository: devopseasylearning/thomisis-weather
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v0.0.1"
@@ -43,10 +42,9 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
-  port: 3000
-  name: thomisis
-
+  name: thomosis-weather
+  type: ClusterIP
+  port: 5000
 
 ingress:
   enabled: false
@@ -91,10 +89,10 @@ volumes: []
 #     optional: false
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts: 
+- name: weather-data
+  mountPath: "/var/lib/weatherdata"
+  readOnly: true
 
 nodeSelector: {}
 
