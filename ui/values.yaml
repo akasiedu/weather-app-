@@ -2,8 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-app_name: thomosis_ui
+app_name: thomosis-ui
 
+configname: thomosis-ui-configmap
 
 replicaCount: 1
 
@@ -45,7 +46,7 @@ securityContext: {}
 service:
   type: NodePort
   port: 3000
-  name: thomisis
+  name: ui
 
 
 ingress:

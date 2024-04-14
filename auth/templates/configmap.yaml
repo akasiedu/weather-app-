@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.app_name }}-configmap
 data:
-  DB_HOST: db
-  DB_PASSWORD: my-secret-pw
+  DB_HOST: "mysql"
+  DB_PASSWORD: "bXktc2VjcmV0LXB3"

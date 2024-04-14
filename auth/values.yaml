@@ -44,7 +44,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 8080
-  name: thomosis-auth
+  name: auth
 
 ingress:
   enabled: false
@@ -89,10 +89,10 @@ volumes: []
 #     optional: false
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: 
-- name: user-data
-  mountPath: "/var/lib/userdata"
-  readOnly: true
+volumeMounts: []
+# - name: user-data
+#   mountPath: "/var/lib/userdata"
+#   readOnly: true
 
 nodeSelector: {}
 
